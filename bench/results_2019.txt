@@ -1,0 +1,30 @@
+# Buehler, Gonon, Teichmann, Wood (2019), Section 5
+
+Training: 30,000 steps per run, batch 256, lr 0.005, 3 seeds. Held-out: 500,000 paths, identical for every run.
+
+| claim | paper | reproduced | mean trading gain |
+|---|---:|---:|---:|
+| Risk-neutral ATM price q | 1.69 | 1.6918 |  |
+| Deep hedge price, 50% CVaR, no costs | 1.94 | 1.9832 ± 0.0021 | -0.0047 |
+| Deep hedge price, 99% CVaR, no costs | 3.49 | 2.8567 ± 0.0459 | -0.0049 |
+| 1% costs, 99% CVaR, recurrent network | 5.5137 | 4.6144 ± 0.0392 | -1.3775 |
+| 1% costs, 99% CVaR, simpler network | 6.7446 | 4.6385 ± 0.0961 | -1.4212 |
+
+Mean trading gain is E[P&L] + E[Z] on held-out paths: zero in an arbitrage-free market without costs, minus the average cost with them. A positive value would mean the policy is harvesting a flaw in the simulator rather than hedging.
+
+Heston model hedge (stock + variance swap) on the same held-out paths: 50% CVaR 1.9462, 99% CVaR 3.4184, P&L mean -0.0093, std 0.3799.
+
+## Figure 7: realized CVaR of each strategy, net of the risk-neutral price
+
+| strategy | paper 50% CVaR | ours | paper 99% CVaR | ours |
+|---|---:|---:|---:|---:|
+| trained on 99% CVaR | 0.527 | 0.5580 | 1.8034 | 1.1648 |
+| trained on 50% CVaR | 0.2531 | 0.2914 | 2.3631 | 2.1345 |
+
+## Section 5.3: price convergence under small proportional costs
+
+| market | paper slope | reproduced slope | theory |
+|---|---:|---:|---:|
+| Black-Scholes | 0.67 | 0.698 ± 0.004 | 0.667 |
+| Heston | 0.71 | 0.638 ± 0.024 | 0.667 |
+

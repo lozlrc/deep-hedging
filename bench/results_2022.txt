@@ -1,0 +1,49 @@
+# Murray, Wood, Buehler, Wiese, Pakkanen (2022), Table 1
+
+v0 = 0.12054, fitted on the single BS-delta cell at K = 1.00 (scripts/calibrate_v0.py); the other four BS-delta cells are predictions.
+
+Held-out: 200,000 paths shared by every policy. Vanilla deep hedging: 15,000 steps of 256 paths per strike. Actor-critic: 15,000 iterations of 2048 episodes, one model for all strikes and all lambda (the paper ran 100,000 iterations). Seeds [0, 10], reported as mean ± std across seeds.
+
+Exponential utility at lambda = 0.1 of the hedged P&L, higher is better:
+
+| K | BS delta, paper | ours | vanilla DH, paper | ours | actor-critic, paper | ours |
+|---|---:|---:|---:|---:|---:|---:|
+| 0.90 | -11.1 | -11.035 | -10.87 | -10.936 ± 0.006 | -10.91 | -10.918 ± 0.002 |
+| 0.95 | -7.06 | -7.021 | -6.74 | -6.867 ± 0.005 | -6.68 | -6.842 ± 0.003 |
+| 1.00 | -3.78 | -3.780 | -3.36 | -3.590 ± 0.004 | -3.41 | -3.560 ± 0.003 |
+| 1.05 | -1.52 | -1.586 | -1.14 | -1.395 ± 0.007 | -1.11 | -1.365 ± 0.001 |
+| 1.10 | -0.43 | -0.491 | -0.26 | -0.349 ± 0.011 | -0.27 | -0.331 ± 0.004 |
+
+Gain over the BS delta hedge, which is what Table 1 is about:
+
+| K | vanilla DH, paper | ours | actor-critic, paper | ours |
+|---|---:|---:|---:|---:|
+| 0.90 | +0.23 | +0.099 | +0.19 | +0.117 |
+| 0.95 | +0.32 | +0.154 | +0.38 | +0.179 |
+| 1.00 | +0.42 | +0.190 | +0.37 | +0.220 |
+| 1.05 | +0.38 | +0.191 | +0.41 | +0.221 |
+| 1.10 | +0.17 | +0.141 | +0.16 | +0.160 |
+
+## Not in the paper: an analytic band and an ablation
+
+Whalley-Wilmott is the classic closed-form no-trade band for proportional costs (risk aversion set to the same lambda). The ablation is vanilla deep hedging with the previous holding removed from the network input.
+
+| K | BS delta | Whalley-Wilmott | vanilla DH | vanilla DH, no holding input | actor-critic |
+|---|---:|---:|---:|---:|---:|
+| 0.90 | -11.035 | -10.933 | -10.936 | -10.950 | -10.918 |
+| 0.95 | -7.021 | -6.866 | -6.867 | -6.902 | -6.842 |
+| 1.00 | -3.780 | -3.593 | -3.590 | -3.634 | -3.560 |
+| 1.05 | -1.586 | -1.399 | -1.395 | -1.422 | -1.365 |
+| 1.10 | -0.491 | -0.352 | -0.349 | -0.348 | -0.331 |
+
+## One actor-critic across risk aversions (K = 1.00)
+
+The trained network conditioned on each lambda and scored at that lambda, against the same network frozen at lambda = 0.1 and scored at the same lambda. Higher is better.
+
+| lambda | conditioned on lambda | frozen at 0.1 | gain from conditioning |
+|---:|---:|---:|---:|
+| 0.0001 | -3.312 | -3.459 | +0.147 |
+| 0.005 | -3.369 | -3.464 | +0.095 |
+| 0.1 | -3.560 | -3.560 | +0.000 |
+| 1 | -4.049 | -4.547 | +0.498 |
+
